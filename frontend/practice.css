@@ -322,6 +322,18 @@ audio {
   line-height: 1.12;
 }
 
+.sentence-hint {
+  min-height: 30px;
+  margin: -6px 0 0;
+  color: var(--water);
+  font-size: clamp(18px, 3vw, 26px);
+  line-height: 1.35;
+}
+
+.sentence-hint[hidden] {
+  display: none;
+}
+
 .controls-row,
 .shadow-actions {
   display: grid;

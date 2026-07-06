@@ -51,6 +51,7 @@ const els = {
   intensiveCount: document.querySelector("#intensive-count"),
   intensiveRange: document.querySelector("#intensive-range"),
   intensiveText: document.querySelector("#intensive-text"),
+  intensiveHint: document.querySelector("#intensive-hint"),
   prevIntensive: document.querySelector("#prev-intensive"),
   playIntensive: document.querySelector("#play-intensive"),
   replayIntensive: document.querySelector("#replay-intensive"),
@@ -60,6 +61,7 @@ const els = {
   shadowingCount: document.querySelector("#shadowing-count"),
   shadowingStatus: document.querySelector("#shadowing-status"),
   shadowingText: document.querySelector("#shadowing-text"),
+  shadowingHint: document.querySelector("#shadowing-hint"),
   prevShadowing: document.querySelector("#prev-shadowing"),
   playShadowing: document.querySelector("#play-shadowing"),
   shadowingRepeat: document.querySelector("#shadowing-repeat"),
@@ -218,8 +220,12 @@ function renderSentence() {
   els.intensiveCount.textContent = count;
   els.intensiveRange.textContent = range;
   els.intensiveText.textContent = current.text;
+  els.intensiveHint.textContent = current.translationHint || "";
+  els.intensiveHint.hidden = !current.translationHint;
   els.shadowingCount.textContent = count;
   els.shadowingText.textContent = current.text;
+  els.shadowingHint.textContent = current.translationHint || "";
+  els.shadowingHint.hidden = !current.translationHint;
   els.shadowingStatus.textContent = state.progress.shadowedIds.includes(current.id) ? "Done" : "Not done";
   els.markDifficult.classList.toggle("active", state.progress.difficultIds.includes(current.id));
 }
