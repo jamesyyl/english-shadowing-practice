@@ -261,6 +261,10 @@ audio {
   justify-content: flex-end;
 }
 
+.merge-actions {
+  justify-content: flex-start;
+}
+
 .message {
   min-height: 24px;
   color: var(--blue);

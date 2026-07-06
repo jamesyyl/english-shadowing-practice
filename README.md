@@ -79,7 +79,7 @@ node scripts/apply-segment-review.js --episodeId bedtime-old-woman-shoe --review
 node scripts/export-clean-segments.js --episodeId bedtime-old-woman-shoe
 ```
 
-The current sample review disables LibriVox intro / ending metadata and splits the mixed title + first sentence segment so `clean-segments.json` starts with story text.
+The current sample review disables LibriVox intro / ending metadata, splits the mixed title + first sentence segment, and merges the first broken story sentence so `clean-segments.json` starts with a complete sentence.
 
 Run the local review and practice server:
 
@@ -135,4 +135,4 @@ MP3
 
 The current implementation covers the local production pipeline and the first static child-facing three-stage practice UI. The next milestone is publishing the repository through GitHub Pages.
 
-Current ASR note: `openai-whisper tiny.en` is working for the proof-of-concept sample. The generated Whisper JSON is imported into `data/episodes/bedtime-old-woman-shoe/episode.json`; the reviewed clean segment export currently contains 102 practice segments.
+Current ASR note: `openai-whisper tiny.en` is working for the proof-of-concept sample. The generated Whisper JSON is imported into `data/episodes/bedtime-old-woman-shoe/episode.json`; the reviewed clean segment export currently contains 101 practice segments.

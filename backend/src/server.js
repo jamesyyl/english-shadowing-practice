@@ -119,6 +119,34 @@ function splitSegment(episode, segmentId, splitSegments) {
   episode.status = "reviewed";
 }
 
+function mergeWithNextSegment(episode, segmentId) {
+  const index = episode.segments.findIndex((candidate) => candidate.id === segmentId);
+  if (index === -1) throw new Error(`Segment not found: ${segmentId}`);
+  if (index >= episode.segments.length - 1) throw new Error(`Segment ${segmentId} has no next segment to merge.`);
+
+  const current = episode.segments[index];
+  const next = episode.segments[index + 1];
+  const mergedText = `${current.text || ""} ${next.text || ""}`.replace(/\s+([,.!?;:])/g, "$1").replace(/\s+/g, " ").trim();
+  if (!mergedText) throw new Error("Merged text is empty.");
+
+  const merged = {
+    ...current,
+    endTime: Number(next.endTime),
+    text: mergedText,
+    translationHint: [current.translationHint, next.translationHint].filter(Boolean).join("\n"),
+    keywords: [...new Set([...(current.keywords || []), ...(next.keywords || [])])],
+    phraseNotes: [...(current.phraseNotes || []), ...(next.phraseNotes || [])],
+    wordTimings: [...(current.wordTimings || []), ...(next.wordTimings || [])]
+  };
+
+  if (!Number.isFinite(merged.startTime) || !Number.isFinite(merged.endTime) || merged.startTime >= merged.endTime) {
+    throw new Error(`Invalid merged time range for ${segmentId}.`);
+  }
+
+  episode.segments.splice(index, 2, merged);
+  episode.status = "reviewed";
+}
+
 async function exportCleanSegments(episodeId, episode) {
   const cleanSegments = getCleanEnglishSegments(episode);
   const outputPath = path.join(repoRoot, "data", "episodes", episodeId, "clean-segments.json");
@@ -194,6 +222,13 @@ async function route(request, response) {
       if (parts[3] === "segments" && parts[4] && parts[5] === "split" && request.method === "POST") {
         const body = await readRequestBody(request);
         splitSegment(episode, parts[4], body.segments);
+        await writeEpisode(episodeId, episode);
+        sendJson(response, 200, { episode, cleanSegmentCount: getCleanEnglishSegments(episode).length });
+        return;
+      }
+
+      if (parts[3] === "segments" && parts[4] && parts[5] === "merge-next" && request.method === "POST") {
+        mergeWithNextSegment(episode, parts[4]);
         await writeEpisode(episodeId, episode);
         sendJson(response, 200, { episode, cleanSegmentCount: getCleanEnglishSegments(episode).length });
         return;

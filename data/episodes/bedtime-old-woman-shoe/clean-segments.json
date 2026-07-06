@@ -2,25 +2,13 @@
   "episodeId": "bedtime-old-woman-shoe",
   "title": "When the Old Woman Moved From the Shoe",
   "audioFile": "audio/original.mp3",
-  "segmentCount": 102,
+  "segmentCount": 101,
   "segments": [
     {
       "id": "seg-007",
       "startTime": 26.2,
-      "endTime": 29.96,
-      "text": "There was once a little goblin woman who had",
-      "translationHint": "",
-      "keywords": [],
-      "phraseNotes": [],
-      "wordTimings": [],
-      "enabledForPractice": true,
-      "contentType": "main"
-    },
-    {
-      "id": "seg-008",
-      "startTime": 29.96,
       "endTime": 30.96,
-      "text": "six sons.",
+      "text": "There was once a little goblin woman who had six sons.",
       "translationHint": "",
       "keywords": [],
       "phraseNotes": [],

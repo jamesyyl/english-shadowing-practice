@@ -21,26 +21,28 @@ For the current LibriVox sample:
 - `seg-001` through `seg-006` are intro metadata and are disabled.
 - The original mixed `seg-007` is split into disabled `seg-007-title` and practice `seg-007`.
 - `seg-109` is the ending metadata and is disabled.
-- `clean-segments.json` contains 102 practice segments.
-- The first clean segment is `seg-007`: `There was once a little goblin woman who had`.
+- `seg-007` and `seg-008` are merged into one complete opening sentence.
+- `clean-segments.json` contains 101 practice segments.
+- The first clean segment is `seg-007`: `There was once a little goblin woman who had six sons.`
 
 ## Local Review UI
 
 - `npm run review` starts the local review workbench at `http://127.0.0.1:5177`.
 - The episode list loads `bedtime-old-woman-shoe`.
-- The workbench shows 110 total segments and 102 practice segments.
+- The workbench shows 109 total segments and 101 practice segments.
 - The segment list can be filtered and restored.
 - The editor can show segment id, start / end time, text, `contentType`, practice enabled state, Chinese hint, keywords, and phrase notes.
 - The audio control loads `/api/episodes/bedtime-old-woman-shoe/audio`.
 - `Play segment` plays the selected segment range.
 - Saving a segment writes to `episode.json`.
-- `Export` writes `data/episodes/bedtime-old-woman-shoe/clean-segments.json` and reports 102 segments.
+- `Merge with next segment` merges the selected segment with the following segment and preserves the selected segment id.
+- `Export` writes `data/episodes/bedtime-old-woman-shoe/clean-segments.json` and reports 101 segments.
 
 ## Child Practice UI
 
 - `npm run practice` starts the same local server and exposes `http://127.0.0.1:5177/practice`.
 - The practice UI loads `data/episodes/bedtime-old-woman-shoe/clean-segments.json`.
-- The practice UI shows the episode title and 102 clean English practice segments.
+- The practice UI shows the episode title and 101 clean English practice segments.
 - The audio control loads `data/episodes/bedtime-old-woman-shoe/audio/original.mp3` and reports a duration of about 7:31.
 - Stage 1 supports whole-episode listening and Chinese understanding hints.
 - Completing Stage 1 moves the UI into Stage 2.
@@ -56,4 +58,4 @@ For the current LibriVox sample:
 - `frontend/practice.html` uses relative `practice.css` and `practice.js` paths.
 - The practice JavaScript can load `../data/episodes/bedtime-old-woman-shoe/clean-segments.json` when served from GitHub Pages.
 - `data/episodes/bedtime-old-woman-shoe/audio/original.mp3` is not ignored by Git and can be published as a static asset.
-- Live Pages verification loaded 102 segments, the 7:31 MP3, and no browser console errors.
+- Live Pages verification loaded the clean segment list, the 7:31 MP3, and no browser console errors.

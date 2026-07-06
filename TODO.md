@@ -38,7 +38,7 @@
 - [x] Add root `index.html` for Pages.
 - [x] Commit and push the repo to GitHub.
 - [x] Enable GitHub Pages from the repository root.
-- [x] Verify live Pages app loads 102 segments and the MP3.
+- [x] Verify live Pages app loads the clean segments and the MP3.
 
 ## Later
 

@@ -31,6 +31,7 @@ const els = {
   splitTextA: document.querySelector("#split-text-a"),
   splitTextB: document.querySelector("#split-text-b"),
   applySplit: document.querySelector("#apply-split"),
+  mergeNext: document.querySelector("#merge-next"),
   message: document.querySelector("#message")
 };
 
@@ -217,6 +218,22 @@ async function splitSelectedSegment() {
   showMessage(`Split ${segment.id}`);
 }
 
+async function mergeSelectedWithNextSegment() {
+  const segment = selectedSegment();
+  if (!segment) return;
+
+  const result = await api(`/api/episodes/${state.episode.id}/segments/${segment.id}/merge-next`, {
+    method: "POST",
+    body: "{}"
+  });
+  state.episode = result.episode;
+  state.selectedId = segment.id;
+  renderMetrics(result.cleanSegmentCount);
+  renderSegments();
+  renderEditor();
+  showMessage(`Merged ${segment.id} with next segment`);
+}
+
 async function exportCleanSegments() {
   const result = await api(`/api/episodes/${state.episode.id}/export-clean`, { method: "POST", body: "{}" });
   showMessage(`Exported ${result.segmentCount} segments to ${result.output}`);
@@ -237,6 +254,7 @@ els.segments.addEventListener("click", (event) => {
 els.form.addEventListener("submit", (event) => saveSelectedSegment(event).catch((error) => showMessage(error.message)));
 els.playSegment.addEventListener("click", playSelectedSegment);
 els.applySplit.addEventListener("click", () => splitSelectedSegment().catch((error) => showMessage(error.message)));
+els.mergeNext.addEventListener("click", () => mergeSelectedWithNextSegment().catch((error) => showMessage(error.message)));
 els.exportClean.addEventListener("click", () => exportCleanSegments().catch((error) => showMessage(error.message)));
 
 loadEpisodes().catch((error) => showMessage(error.message));
