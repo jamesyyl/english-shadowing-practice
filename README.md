@@ -105,6 +105,12 @@ The practice app reads `clean-segments.json` and the MP3 directly from `data/`, 
 
 ## GitHub Pages
 
+Live app:
+
+```text
+https://jamesyyl.github.io/english-shadowing-practice/
+```
+
 The repository is ready for branch-based GitHub Pages from the repository root:
 
 ```text
@@ -113,7 +119,7 @@ frontend/practice.html -> ../data/episodes/bedtime-old-woman-shoe/clean-segments
 frontend/practice.html -> ../data/episodes/bedtime-old-woman-shoe/audio/original.mp3
 ```
 
-After pushing to GitHub, configure Pages to publish from `main` / repository root. The public practice URL will open the child-facing practice app first.
+Pages is configured to publish from `main` / repository root. The public practice URL opens the child-facing practice app first.
 
 ## Data Flow
 

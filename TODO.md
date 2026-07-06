@@ -36,8 +36,9 @@
 
 - [x] Harden static asset paths and README for GitHub Pages publishing.
 - [x] Add root `index.html` for Pages.
-- [ ] Commit and push the repo to GitHub.
-- [ ] Enable GitHub Pages from the repository root.
+- [x] Commit and push the repo to GitHub.
+- [x] Enable GitHub Pages from the repository root.
+- [x] Verify live Pages app loads 102 segments and the MP3.
 
 ## Later
 

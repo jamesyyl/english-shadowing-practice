@@ -51,7 +51,9 @@ For the current LibriVox sample:
 
 ## GitHub Pages Static Path
 
+- Live app: `https://jamesyyl.github.io/english-shadowing-practice/`.
 - `index.html` exists at the repository root and redirects to `frontend/practice.html`.
 - `frontend/practice.html` uses relative `practice.css` and `practice.js` paths.
 - The practice JavaScript can load `../data/episodes/bedtime-old-woman-shoe/clean-segments.json` when served from GitHub Pages.
 - `data/episodes/bedtime-old-woman-shoe/audio/original.mp3` is not ignored by Git and can be published as a static asset.
+- Live Pages verification loaded 102 segments, the 7:31 MP3, and no browser console errors.
