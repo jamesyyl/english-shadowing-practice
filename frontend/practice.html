@@ -8,26 +8,35 @@
   </head>
   <body>
     <main class="practice-shell">
-      <section class="episode-hero">
-        <div class="title-block">
-          <p class="eyebrow">English Shadowing Practice</p>
+      <header class="practice-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">English Shadowing</p>
           <h1 id="episode-title">Loading...</h1>
+          <div class="episode-switcher">
+            <label for="episode-select">練習內容</label>
+            <select id="episode-select"></select>
+          </div>
         </div>
         <div class="progress-card" aria-live="polite">
           <span id="stage-label">Stage 1</span>
           <strong id="overall-progress">0%</strong>
+          <small>整集進度</small>
         </div>
-      </section>
-
-      <section class="episode-switcher">
-        <label for="episode-select">選擇練習內容</label>
-        <select id="episode-select"></select>
-      </section>
+      </header>
 
       <nav class="stage-tabs" aria-label="Practice stages">
-        <button class="stage-tab active" data-stage="listen">1 先聽整集</button>
-        <button class="stage-tab" data-stage="intensive">2 純英文精聽</button>
-        <button class="stage-tab" data-stage="shadowing">3 Shadowing</button>
+        <button class="stage-tab active" data-stage="listen">
+          <span>1</span>
+          先聽整集
+        </button>
+        <button class="stage-tab" data-stage="intensive">
+          <span>2</span>
+          純英文精聽
+        </button>
+        <button class="stage-tab" data-stage="shadowing">
+          <span>3</span>
+          Shadowing
+        </button>
       </nav>
 
       <section class="player-band">
@@ -41,11 +50,12 @@
       <section id="listen-panel" class="stage-panel active">
         <div class="listen-layout">
           <section class="focus-panel">
-            <h2>理解重點</h2>
+            <p class="panel-kicker">Before shadowing</p>
+            <h2>先抓整集意思</h2>
             <p id="episode-summary"></p>
             <div id="focus-chips" class="chip-row"></div>
           </section>
-          <section class="big-action-panel">
+          <section class="listen-action-panel">
             <div class="ring" aria-hidden="true">
               <span id="listen-percent">0%</span>
             </div>
@@ -100,6 +110,7 @@
             </div>
           </section>
           <section class="summary-panel">
+            <p class="panel-kicker">Session</p>
             <h2>練習紀錄</h2>
             <dl>
               <div>

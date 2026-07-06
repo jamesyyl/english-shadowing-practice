@@ -10,6 +10,9 @@ const els = {
   statusLabel: document.querySelector("#status-label"),
   segmentCount: document.querySelector("#segment-count"),
   cleanCount: document.querySelector("#clean-count"),
+  audioCount: document.querySelector("#audio-count"),
+  pipelineSteps: document.querySelectorAll(".pipeline-step"),
+  openPractice: document.querySelector("#open-practice"),
   importMode: document.querySelector("#import-mode"),
   importId: document.querySelector("#import-id"),
   importTitle: document.querySelector("#import-title"),
@@ -75,9 +78,31 @@ function selectedSegment() {
 }
 
 function renderMetrics(cleanSegmentCount) {
+  const audioCount = state.episode?.segments.filter((segment) => segment.audioFile).length ?? 0;
   els.statusLabel.textContent = state.episode?.status || "-";
   els.segmentCount.textContent = state.episode?.segments.length ?? "-";
   els.cleanCount.textContent = cleanSegmentCount ?? state.episode?.segments.filter((segment) => segment.enabledForPractice && segment.contentType === "main").length ?? "-";
+  els.audioCount.textContent = state.episode ? `${audioCount}` : "-";
+  renderPipeline();
+}
+
+function renderPipeline() {
+  const hasEpisode = Boolean(state.episode);
+  const cleanCount = state.episode?.segments.filter((segment) => segment.enabledForPractice && segment.contentType === "main").length ?? 0;
+  const audioCount = state.episode?.segments.filter((segment) => segment.audioFile).length ?? 0;
+  const hasExport = hasEpisode && cleanCount > 0;
+  const done = {
+    1: hasEpisode,
+    2: cleanCount > 0,
+    3: audioCount > 0,
+    4: hasExport && state.episode?.status === "ready"
+  };
+  const activeStep = !hasEpisode ? 1 : !done[2] ? 2 : !done[3] ? 3 : 4;
+  els.pipelineSteps.forEach((step) => {
+    const number = Number(step.dataset.pipelineStep);
+    step.classList.toggle("done", Boolean(done[number]));
+    step.classList.toggle("active", number === activeStep);
+  });
 }
 
 function renderEpisodes() {
@@ -137,6 +162,7 @@ async function loadEpisode(episodeId) {
   const payload = await api(`/api/episodes/${episodeId}`);
   state.episode = payload.episode;
   state.selectedId = state.episode.segments[0]?.id || null;
+  els.openPractice.href = `/practice?episode=${encodeURIComponent(episodeId)}`;
   els.audio.src = state.episode.audioFile ? `/api/episodes/${episodeId}/audio` : "";
   renderMetrics(payload.cleanSegmentCount);
   renderSegments();
@@ -257,6 +283,11 @@ async function exportCleanSegments() {
   showMessage(`Exported ${result.segmentCount} segments to ${result.output}`);
 }
 
+async function finishAndOpenPractice() {
+  await exportCleanSegments();
+  window.open(`/practice?episode=${encodeURIComponent(state.episode.id)}`, "_blank", "noopener");
+}
+
 async function createEpisodeFromImport() {
   const mode = els.importMode.value;
   const episodeId = els.importId.value.trim();
@@ -318,6 +349,6 @@ els.mergeNext.addEventListener("click", () => mergeSelectedWithNextSegment().cat
 els.exportClean.addEventListener("click", () => exportCleanSegments().catch((error) => showMessage(error.message)));
 els.createEpisode.addEventListener("click", () => createEpisodeFromImport().catch((error) => showMessage(error.message)));
 els.generateTts.addEventListener("click", () => generateTtsForSelectedEpisode().catch((error) => showMessage(error.message)));
-els.exportAfterTts.addEventListener("click", () => exportCleanSegments().catch((error) => showMessage(error.message)));
+els.exportAfterTts.addEventListener("click", () => finishAndOpenPractice().catch((error) => showMessage(error.message)));
 
 loadEpisodes().catch((error) => showMessage(error.message));

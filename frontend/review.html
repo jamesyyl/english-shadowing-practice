@@ -1,119 +1,119 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Episode Review Workbench</title>
+    <title>Listening Pack Builder</title>
     <link rel="stylesheet" href="/review.css" />
   </head>
   <body>
-    <main class="shell">
-      <section class="topbar">
+    <main class="builder-shell">
+      <header class="builder-hero">
         <div>
-          <p class="eyebrow">English Shadowing Practice</p>
-          <h1>Episode Review Workbench</h1>
+          <p class="eyebrow">Listening Pack Builder</p>
+          <h1>把文本變成可練習的逐句聽讀包</h1>
         </div>
         <div class="episode-picker">
-          <label for="episode-select">Episode</label>
+          <label for="episode-select">目前素材</label>
           <select id="episode-select"></select>
+          <a id="open-practice" class="link-button" href="/practice">打開練習頁</a>
+        </div>
+      </header>
+
+      <section class="pipeline" aria-label="Production pipeline">
+        <div class="pipeline-step active" data-pipeline-step="1">
+          <span>1</span>
+          <strong>導入</strong>
+          <small>Text / SRT</small>
+        </div>
+        <div class="pipeline-step" data-pipeline-step="2">
+          <span>2</span>
+          <strong>整理</strong>
+          <small>句子、提示、取捨</small>
+        </div>
+        <div class="pipeline-step" data-pipeline-step="3">
+          <span>3</span>
+          <strong>生成</strong>
+          <small>TTS MP3</small>
+        </div>
+        <div class="pipeline-step" data-pipeline-step="4">
+          <span>4</span>
+          <strong>匯出</strong>
+          <small>給 Pages 使用</small>
         </div>
       </section>
 
       <section class="metrics" aria-live="polite">
         <div>
-          <span class="label">Status</span>
+          <span class="label">狀態</span>
           <strong id="status-label">-</strong>
         </div>
         <div>
-          <span class="label">Segments</span>
+          <span class="label">句子</span>
           <strong id="segment-count">-</strong>
         </div>
         <div>
-          <span class="label">Practice</span>
+          <span class="label">練習句</span>
           <strong id="clean-count">-</strong>
+        </div>
+        <div>
+          <span class="label">音檔</span>
+          <strong id="audio-count">-</strong>
         </div>
       </section>
 
       <section class="import-panel">
-        <div class="import-head">
-          <div>
-            <h2>Import Text or SRT</h2>
-            <p>Local only. This writes episode JSON and optional TTS MP3 files under <code>data/episodes/</code>.</p>
-          </div>
-          <div class="import-mode">
-            <label>
-              Mode
-              <select id="import-mode">
-                <option value="text">Text</option>
-                <option value="srt">SRT</option>
-              </select>
-            </label>
-          </div>
+        <div class="section-title">
+          <p class="eyebrow">Step 1</p>
+          <h2>導入文本或 SRT</h2>
         </div>
-        <div class="form-line import-fields">
+        <div class="import-grid">
           <label>
-            Episode id
-            <input id="import-id" placeholder="my-episode-id" />
-          </label>
-          <label>
-            Title
-            <input id="import-title" placeholder="Episode title" />
-          </label>
-          <label>
-            Source URL
-            <input id="import-source" placeholder="Optional" />
-          </label>
-        </div>
-        <label>
-          Text / SRT content
-          <textarea id="import-content" rows="7" placeholder="Paste English text or SRT here"></textarea>
-        </label>
-        <div class="tts-row">
-          <label>
-            TTS provider
-            <select id="tts-provider">
-              <option value="auto">auto</option>
-              <option value="openai">openai</option>
-              <option value="google">google fallback</option>
+            來源類型
+            <select id="import-mode">
+              <option value="text">貼上文本</option>
+              <option value="srt">貼上 SRT</option>
             </select>
           </label>
           <label>
-            OpenAI voice
-            <input id="tts-voice" value="coral" />
+            Episode id
+            <input id="import-id" placeholder="taipei-zoo" />
           </label>
           <label>
-            Model
-            <input id="tts-model" value="gpt-4o-mini-tts" />
+            標題
+            <input id="import-title" placeholder="Taipei Zoo Night Opening" />
           </label>
-          <label class="check">
-            <input id="tts-force" type="checkbox" />
-            Regenerate existing MP3
+          <label>
+            來源 URL
+            <input id="import-source" placeholder="可留空" />
           </label>
         </div>
-        <div class="actions import-actions">
-          <button id="create-episode" type="button">Create episode</button>
-          <button id="generate-tts" type="button">Generate TTS for selected episode</button>
-          <button id="export-after-tts" type="button">Export selected clean segments</button>
+        <textarea id="import-content" class="source-box" rows="8" placeholder="貼上英文文本或 SRT，建立後會自動分句"></textarea>
+        <div class="import-actions">
+          <button id="create-episode" type="button" class="primary-action">建立素材並開始整理</button>
         </div>
       </section>
 
-      <section class="workspace">
-        <aside class="segment-list">
-          <div class="list-head">
-            <input id="filter-input" type="search" placeholder="Filter text or id" />
-            <button id="export-clean">Export</button>
+      <section class="production-layout">
+        <aside class="sentence-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Step 2</p>
+              <h2>整理句子</h2>
+            </div>
+            <input id="filter-input" type="search" placeholder="搜尋句子或 id" />
           </div>
           <div id="segments" class="segments"></div>
         </aside>
 
-        <section class="detail">
-          <div class="audio-panel">
+        <section class="work-panel">
+          <div class="audio-strip">
             <audio id="audio" controls preload="metadata"></audio>
-            <button id="play-segment">Play segment</button>
+            <button id="play-segment" type="button">播放本句</button>
           </div>
 
           <form id="segment-form" class="editor">
-            <div class="form-line">
+            <div class="form-line compact">
               <label>
                 Segment
                 <input id="segment-id" readonly />
@@ -129,13 +129,13 @@
             </div>
 
             <label>
-              Text
+              英文句子
               <textarea id="segment-text" rows="5"></textarea>
             </label>
 
             <div class="form-line">
               <label>
-                Type
+                內容類型
                 <select id="segment-type">
                   <option value="main">main</option>
                   <option value="intro">intro</option>
@@ -146,36 +146,39 @@
               </label>
               <label class="check">
                 <input id="segment-enabled" type="checkbox" />
-                Practice segment
+                納入練習
               </label>
             </div>
 
             <label>
-              Chinese hint
+              中文提示
               <textarea id="segment-hint" rows="3"></textarea>
             </label>
 
             <label>
-              Keywords, comma separated
+              重點單字，逗號分隔
               <input id="segment-keywords" />
             </label>
 
             <label>
-              Phrase notes, one per line
+              片語 / 句型，一行一筆
               <textarea id="segment-phrases" rows="3"></textarea>
             </label>
 
             <div class="actions">
-              <button id="save-segment" type="submit">Save segment</button>
+              <button id="save-segment" type="submit" class="primary-action">儲存本句</button>
             </div>
           </form>
 
           <section class="splitter">
-            <h2>Edit Segment Boundaries</h2>
-            <div class="actions merge-actions">
-              <button id="merge-next" type="button">Merge with next segment</button>
+            <div class="section-title">
+              <p class="eyebrow">句子工具</p>
+              <h2>合併或拆分</h2>
             </div>
-            <div class="form-line">
+            <div class="actions merge-actions">
+              <button id="merge-next" type="button">與下一句合併</button>
+            </div>
+            <div class="form-line compact">
               <label>
                 Split time
                 <input id="split-time" type="number" step="0.01" />
@@ -190,21 +193,55 @@
               </label>
             </div>
             <label>
-              First text
+              第一段文字
               <textarea id="split-text-a" rows="3"></textarea>
             </label>
             <label>
-              Second text
+              第二段文字
               <textarea id="split-text-b" rows="3"></textarea>
             </label>
             <div class="actions">
-              <button id="apply-split">Apply split</button>
+              <button id="apply-split" type="button">套用拆分</button>
+            </div>
+          </section>
+
+          <section class="publish-panel">
+            <div class="section-title">
+              <p class="eyebrow">Step 3 / 4</p>
+              <h2>生成音檔並匯出</h2>
+            </div>
+            <div class="tts-grid">
+              <label>
+                TTS provider
+                <select id="tts-provider">
+                  <option value="auto">auto</option>
+                  <option value="openai">openai</option>
+                  <option value="google">google fallback</option>
+                </select>
+              </label>
+              <label>
+                OpenAI voice
+                <input id="tts-voice" value="coral" />
+              </label>
+              <label>
+                Model
+                <input id="tts-model" value="gpt-4o-mini-tts" />
+              </label>
+              <label class="check">
+                <input id="tts-force" type="checkbox" />
+                重新生成既有 MP3
+              </label>
+            </div>
+            <div class="actions publish-actions">
+              <button id="generate-tts" type="button">生成 TTS 音檔</button>
+              <button id="export-clean" type="button">匯出 clean segments</button>
+              <button id="export-after-tts" type="button" class="primary-action">完成並打開練習</button>
             </div>
           </section>
         </section>
       </section>
 
-      <p id="message" class="message"></p>
+      <p id="message" class="message" aria-live="polite"></p>
     </main>
 
     <script src="/review.js" type="module"></script>
