@@ -10,6 +10,7 @@
     "import:srt": "node scripts/import-srt.js",
     "import:text": "node scripts/import-text.js",
     "tts": "node scripts/generate-tts.js",
+    "export:index": "node scripts/export-episode-index.js",
     "review": "node backend/src/server.js",
     "practice": "node backend/src/server.js"
   },

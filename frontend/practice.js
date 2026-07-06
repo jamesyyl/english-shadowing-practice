@@ -1,5 +1,5 @@
-const episodeId = new URLSearchParams(window.location.search).get("episode") || "youtube-shadowing-steps";
-const progressKey = `english-shadowing-progress:${episodeId}`;
+const defaultEpisodeId = "youtube-shadowing-steps";
+const requestedEpisodeId = new URLSearchParams(window.location.search).get("episode") || defaultEpisodeId;
 
 const fallbackFocus = {
   summary:
@@ -9,6 +9,8 @@ const fallbackFocus = {
 
 const state = {
   stage: "listen",
+  episodeId: requestedEpisodeId,
+  episodeOptions: [],
   episode: null,
   segments: [],
   dataBase: "",
@@ -29,6 +31,7 @@ const state = {
 
 const els = {
   title: document.querySelector("#episode-title"),
+  episodeSelect: document.querySelector("#episode-select"),
   stageLabel: document.querySelector("#stage-label"),
   overallProgress: document.querySelector("#overall-progress"),
   audio: document.querySelector("#episode-audio"),
@@ -72,6 +75,23 @@ const els = {
   message: document.querySelector("#status-message")
 };
 
+function progressKey() {
+  return `english-shadowing-progress:${state.episodeId}`;
+}
+
+function emptyProgress() {
+  return {
+    stage: "listen",
+    currentSegmentId: "",
+    listened: false,
+    intensiveCompletedIds: [],
+    shadowedIds: [],
+    difficultIds: [],
+    replayCounts: {},
+    updatedAt: ""
+  };
+}
+
 function unique(items) {
   return [...new Set(items)];
 }
@@ -107,12 +127,13 @@ async function fetchJson(candidates) {
 }
 
 function loadProgress() {
-  const raw = localStorage.getItem(progressKey);
+  state.progress = emptyProgress();
+  const raw = localStorage.getItem(progressKey());
   if (!raw) return;
   try {
     state.progress = { ...state.progress, ...JSON.parse(raw) };
   } catch {
-    localStorage.removeItem(progressKey);
+    localStorage.removeItem(progressKey());
   }
 }
 
@@ -120,7 +141,7 @@ function saveProgress() {
   state.progress.stage = state.stage;
   state.progress.currentSegmentId = segment()?.id || "";
   state.progress.updatedAt = new Date().toISOString();
-  localStorage.setItem(progressKey, JSON.stringify(state.progress));
+  localStorage.setItem(progressKey(), JSON.stringify(state.progress));
 }
 
 function segment() {
@@ -161,6 +182,13 @@ function renderOverview() {
     ? state.episode.focusChips
     : fallbackFocus.chips;
   els.chips.innerHTML = chips.map((chip) => `<span>${escapeHtml(chip)}</span>`).join("");
+}
+
+function renderEpisodeOptions() {
+  els.episodeSelect.innerHTML = state.episodeOptions
+    .map((episode) => `<option value="${escapeHtml(episode.id)}">${escapeHtml(episode.title || episode.id)}</option>`)
+    .join("");
+  els.episodeSelect.value = state.episodeId;
 }
 
 function renderList() {
@@ -370,17 +398,48 @@ function bindEvents() {
     render();
   });
   els.resetProgress.addEventListener("click", () => {
-    localStorage.removeItem(progressKey);
+    localStorage.removeItem(progressKey());
     window.location.reload();
+  });
+  els.episodeSelect.addEventListener("change", () => {
+    const nextEpisodeId = els.episodeSelect.value;
+    const url = new URL(window.location.href);
+    if (nextEpisodeId === defaultEpisodeId) url.searchParams.delete("episode");
+    else url.searchParams.set("episode", nextEpisodeId);
+    window.history.replaceState({}, "", url);
+    loadEpisode(nextEpisodeId).catch((error) => {
+      els.message.textContent = error.message;
+    });
   });
 }
 
-async function init() {
-  bindEvents();
+async function loadEpisodeOptions() {
+  try {
+    const apiEpisodes = await fetchJson(["/api/episodes"]);
+    return apiEpisodes.data.episodes;
+  } catch {
+    const staticIndex = await fetchJson([
+      "/data/episodes/index.json",
+      "../data/episodes/index.json"
+    ]);
+    return staticIndex.data.episodes;
+  }
+}
+
+async function loadEpisode(episodeId) {
+  state.episodeId = episodeId;
+  state.stage = "listen";
+  state.currentIndex = 0;
+  state.listenSequenceIndex = 0;
+  clearStopHandler();
+  els.audio.pause();
+  els.currentTime.textContent = "0:00";
+  els.duration.textContent = "0:00";
+  els.message.textContent = "";
   loadProgress();
   const clean = await fetchJson([
-    `/data/episodes/${episodeId}/clean-segments.json`,
-    `../data/episodes/${episodeId}/clean-segments.json`
+    `/data/episodes/${state.episodeId}/clean-segments.json`,
+    `../data/episodes/${state.episodeId}/clean-segments.json`
   ]);
   state.episode = clean.data;
   state.segments = clean.data.segments;
@@ -388,10 +447,21 @@ async function init() {
     const savedIndex = state.segments.findIndex((item) => item.id === state.progress.currentSegmentId);
     if (savedIndex >= 0) state.currentIndex = savedIndex;
   }
-  state.dataBase = clean.path.startsWith("..") ? `../data/episodes/${episodeId}` : `/data/episodes/${episodeId}`;
+  state.dataBase = clean.path.startsWith("..") ? `../data/episodes/${state.episodeId}` : `/data/episodes/${state.episodeId}`;
   configureListenAudio();
   renderOverview();
+  renderEpisodeOptions();
   setStage(state.progress.stage || "listen");
+}
+
+async function init() {
+  bindEvents();
+  state.episodeOptions = await loadEpisodeOptions();
+  if (!state.episodeOptions.some((episode) => episode.id === state.episodeId)) {
+    state.episodeId = state.episodeOptions[0]?.id || defaultEpisodeId;
+  }
+  renderEpisodeOptions();
+  await loadEpisode(state.episodeId);
 }
 
 init().catch((error) => {

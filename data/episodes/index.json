@@ -1,0 +1,22 @@
+{
+  "episodes": [
+    {
+      "id": "youtube-shadowing-steps",
+      "title": "Shadowing Practice Steps",
+      "sourceType": "youtube-srt",
+      "status": "ready",
+      "segmentCount": 545,
+      "cleanSegmentCount": 545,
+      "ttsProvider": "google-translate"
+    },
+    {
+      "id": "bedtime-old-woman-shoe",
+      "title": "When the Old Woman Moved From the Shoe",
+      "sourceType": "mp3",
+      "status": "reviewed",
+      "segmentCount": 109,
+      "cleanSegmentCount": 100,
+      "ttsProvider": ""
+    }
+  ]
+}

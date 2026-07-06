@@ -142,6 +142,12 @@ http://127.0.0.1:5177/practice?episode=bedtime-old-woman-shoe
 
 The practice app reads `clean-segments.json` and MP3 files directly from `data/`, so the same files can be served by GitHub Pages as static assets. It supports whole-episode listening with understanding hints, clean-English intensive listening, shadowing self-check, difficult sentence marking, replay counts, and resume state in `localStorage`.
 
+The practice page includes an episode selector. Local runs read `/api/episodes`, so newly imported local episodes appear immediately. GitHub Pages reads `data/episodes/index.json`; run this before publishing new committed episodes:
+
+```powershell
+npm run export:index
+```
+
 ## GitHub Pages
 
 Live app:
