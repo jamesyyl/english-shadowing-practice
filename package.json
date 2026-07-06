@@ -7,6 +7,9 @@
   "scripts": {
     "test": "node --test backend/test/*.test.js",
     "verify": "node scripts/verify-episodes.js",
+    "import:srt": "node scripts/import-srt.js",
+    "import:text": "node scripts/import-text.js",
+    "tts": "node scripts/generate-tts.js",
     "review": "node backend/src/server.js",
     "practice": "node backend/src/server.js"
   },

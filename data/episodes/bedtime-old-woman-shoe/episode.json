@@ -106,22 +106,22 @@
       "contentType": "main"
     },
     {
-      "id": "seg-009",
+      "id": "seg-009-a",
       "startTime": 30.96,
-      "endTime": 38.120000000000005,
-      "text": "They were very ugly, little boys with brown, whizzing faces, and eyes as black as",
+      "endTime": 36.1,
+      "text": "They were very ugly,",
       "translationHint": "",
       "keywords": [],
       "phraseNotes": [],
       "wordTimings": [],
-      "enabledForPractice": true,
-      "contentType": "main"
+      "enabledForPractice": false,
+      "contentType": "intro"
     },
     {
-      "id": "seg-010",
-      "startTime": 38.120000000000005,
+      "id": "seg-009",
+      "startTime": 36.1,
       "endTime": 41.24,
-      "text": "slow as they had very big heads.",
+      "text": "little boys with brown, whizzing faces, and eyes as black as slow as they had very big heads.",
       "translationHint": "",
       "keywords": [],
       "phraseNotes": [],

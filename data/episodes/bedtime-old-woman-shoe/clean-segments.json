@@ -1,8 +1,13 @@
 {
   "episodeId": "bedtime-old-woman-shoe",
   "title": "When the Old Woman Moved From the Shoe",
+  "sourceType": "mp3",
+  "sourceUrl": "https://librivox.org/bedtimestories-by-anonymous/",
   "audioFile": "audio/original.mp3",
-  "segmentCount": 101,
+  "ttsProvider": "",
+  "ttsModel": "",
+  "ttsVoice": "",
+  "segmentCount": 100,
   "segments": [
     {
       "id": "seg-007",
@@ -18,21 +23,9 @@
     },
     {
       "id": "seg-009",
-      "startTime": 30.96,
-      "endTime": 38.120000000000005,
-      "text": "They were very ugly, little boys with brown, whizzing faces, and eyes as black as",
-      "translationHint": "",
-      "keywords": [],
-      "phraseNotes": [],
-      "wordTimings": [],
-      "enabledForPractice": true,
-      "contentType": "main"
-    },
-    {
-      "id": "seg-010",
-      "startTime": 38.120000000000005,
+      "startTime": 36.1,
       "endTime": 41.24,
-      "text": "slow as they had very big heads.",
+      "text": "little boys with brown, whizzing faces, and eyes as black as slow as they had very big heads.",
       "translationHint": "",
       "keywords": [],
       "phraseNotes": [],

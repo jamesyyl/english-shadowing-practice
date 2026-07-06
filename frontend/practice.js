@@ -1,17 +1,19 @@
-const episodeId = "bedtime-old-woman-shoe";
+const episodeId = new URLSearchParams(window.location.search).get("episode") || "youtube-shadowing-steps";
 const progressKey = `english-shadowing-progress:${episodeId}`;
 
 const fallbackFocus = {
   summary:
-    "先聽完整故事，抓住人物、地點和問題：Dandelion 遇見住在鞋子裡的老婦人，故事重點在對話、情緒變化和最後的轉折。",
-  chips: ["Dandelion", "old woman", "shoe", "broth", "children", "lesson"]
+    "先聽完整內容，抓住主題、關鍵步驟和重複出現的英文表達。第二階段再逐句精聽，第三階段跟著音訊開口 shadowing。",
+  chips: ["main idea", "key steps", "phrases", "rhythm", "shadowing", "review"]
 };
 
 const state = {
   stage: "listen",
   episode: null,
   segments: [],
+  dataBase: "",
   currentIndex: 0,
+  listenSequenceIndex: 0,
   progress: {
     stage: "listen",
     currentSegmentId: "",
@@ -125,6 +127,15 @@ function segment() {
   return state.segments[state.currentIndex];
 }
 
+function hasSegmentAudio() {
+  return state.segments.some((item) => item.audioFile);
+}
+
+function audioUrlForSegment(item) {
+  if (!item?.audioFile) return "";
+  return `${state.dataBase}/${item.audioFile}`;
+}
+
 function completionPercent() {
   const total = state.segments.length || 1;
   const listen = state.progress.listened ? 1 : 0;
@@ -138,14 +149,18 @@ function setStage(stage) {
   els.tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.stage === stage));
   Object.entries(els.panels).forEach(([key, panel]) => panel.classList.toggle("active", key === stage));
   els.stageLabel.textContent = stage === "listen" ? "Stage 1" : stage === "intensive" ? "Stage 2" : "Stage 3";
+  if (stage === "listen") configureListenAudio();
   saveProgress();
   render();
 }
 
 function renderOverview() {
   els.title.textContent = state.episode.title;
-  els.summary.textContent = fallbackFocus.summary;
-  els.chips.innerHTML = fallbackFocus.chips.map((chip) => `<span>${chip}</span>`).join("");
+  els.summary.textContent = state.episode.summary || fallbackFocus.summary;
+  const chips = Array.isArray(state.episode.focusChips) && state.episode.focusChips.length > 0
+    ? state.episode.focusChips
+    : fallbackFocus.chips;
+  els.chips.innerHTML = chips.map((chip) => `<span>${escapeHtml(chip)}</span>`).join("");
 }
 
 function renderList() {
@@ -166,7 +181,12 @@ function renderSentence() {
   if (!current) return;
 
   const count = `${state.currentIndex + 1} / ${state.segments.length}`;
-  const range = `${formatTime(current.startTime)} - ${formatTime(current.endTime)}`;
+  const range =
+    Number.isFinite(current.sourceStartTime) && Number.isFinite(current.sourceEndTime)
+      ? `${formatTime(current.sourceStartTime)} - ${formatTime(current.sourceEndTime)}`
+      : Number.isFinite(current.startTime) && Number.isFinite(current.endTime)
+        ? `${formatTime(current.startTime)} - ${formatTime(current.endTime)}`
+        : "TTS";
   els.intensiveCount.textContent = count;
   els.intensiveRange.textContent = range;
   els.intensiveText.textContent = current.text;
@@ -207,13 +227,54 @@ function recordReplay() {
   state.progress.replayCounts[current.id] = (state.progress.replayCounts[current.id] || 0) + 1;
 }
 
+function clearStopHandler() {
+  if (state.stopHandler) {
+    els.audio.removeEventListener("timeupdate", state.stopHandler);
+    els.audio.removeEventListener("ended", state.stopHandler);
+    state.stopHandler = null;
+  }
+}
+
+function markIntensivePlaybackDone() {
+  if (state.stage === "intensive") {
+    markCurrentIntensiveDone();
+    saveProgress();
+    if (state.progress.intensiveCompletedIds.length === state.segments.length) {
+      setStage("shadowing");
+    } else {
+      render();
+    }
+  }
+}
+
+function configureListenAudio() {
+  clearStopHandler();
+  if (hasSegmentAudio()) {
+    const current = state.segments[state.listenSequenceIndex] || state.segments[0];
+    if (current) els.audio.src = audioUrlForSegment(current);
+  } else if (state.episode?.audioFile && state.dataBase) {
+    els.audio.src = `${state.dataBase}/${state.episode.audioFile}`;
+  }
+}
+
 function playCurrentSegment({ replay = false } = {}) {
   const current = segment();
   if (!current) return;
-  if (state.stopHandler) els.audio.removeEventListener("timeupdate", state.stopHandler);
+  clearStopHandler();
   if (replay) recordReplay();
-  els.audio.currentTime = current.startTime;
   els.audio.playbackRate = Number(els.playbackRate.value);
+  if (current.audioFile) {
+    els.audio.src = audioUrlForSegment(current);
+    els.audio.currentTime = 0;
+    state.stopHandler = () => {
+      clearStopHandler();
+      markIntensivePlaybackDone();
+    };
+    els.audio.addEventListener("ended", state.stopHandler);
+    els.audio.play();
+    return;
+  }
+  els.audio.currentTime = current.startTime;
   els.audio.play();
   state.stopHandler = () => {
     if (els.audio.currentTime >= current.endTime) {
@@ -221,13 +282,7 @@ function playCurrentSegment({ replay = false } = {}) {
       els.audio.removeEventListener("timeupdate", state.stopHandler);
       state.stopHandler = null;
       if (state.stage === "intensive") {
-        markCurrentIntensiveDone();
-        saveProgress();
-        if (state.progress.intensiveCompletedIds.length === state.segments.length) {
-          setStage("shadowing");
-        } else {
-          render();
-        }
+        markIntensivePlaybackDone();
       }
     }
   };
@@ -291,11 +346,24 @@ function bindEvents() {
   });
   els.audio.addEventListener("timeupdate", () => {
     els.currentTime.textContent = formatTime(els.audio.currentTime);
-    if (state.stage === "listen" && !state.progress.listened) {
+    if (state.stage === "listen" && !state.progress.listened && !hasSegmentAudio()) {
       const percent = Math.round((els.audio.currentTime / (els.audio.duration || 1)) * 100);
       els.listenPercent.textContent = `${Math.min(100, percent || 0)}%`;
       renderStats();
     }
+  });
+  els.audio.addEventListener("ended", () => {
+    if (state.stage !== "listen" || !hasSegmentAudio() || state.progress.listened) return;
+    state.listenSequenceIndex += 1;
+    if (state.listenSequenceIndex >= state.segments.length) {
+      state.progress.listened = true;
+      saveProgress();
+      setStage("intensive");
+      return;
+    }
+    els.listenPercent.textContent = `${Math.round((state.listenSequenceIndex / state.segments.length) * 100)}%`;
+    configureListenAudio();
+    els.audio.play();
   });
   els.audio.addEventListener("loadedmetadata", () => {
     els.duration.textContent = formatTime(els.audio.duration);
@@ -320,8 +388,8 @@ async function init() {
     const savedIndex = state.segments.findIndex((item) => item.id === state.progress.currentSegmentId);
     if (savedIndex >= 0) state.currentIndex = savedIndex;
   }
-  const dataBase = clean.path.startsWith("..") ? `../data/episodes/${episodeId}` : `/data/episodes/${episodeId}`;
-  els.audio.src = `${dataBase}/${clean.data.audioFile}`;
+  state.dataBase = clean.path.startsWith("..") ? `../data/episodes/${episodeId}` : `/data/episodes/${episodeId}`;
+  configureListenAudio();
   renderOverview();
   setStage(state.progress.stage || "listen");
 }

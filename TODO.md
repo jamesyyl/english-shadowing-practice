@@ -40,6 +40,19 @@
 - [x] Enable GitHub Pages from the repository root.
 - [x] Verify live Pages app loads the clean segments and the MP3.
 
+## Completed Text / SRT + TTS Batch
+
+- [x] Add a text import script that splits pasted or file-based English text into complete practice sentences.
+- [x] Add an SRT import script that parses cues, merges cue text into complete sentences, and preserves `sourceStartTime` / `sourceEndTime`.
+- [x] Extend the segment data model so practice segments can use per-sentence `audioFile` MP3s while keeping the current original-MP3 `startTime` / `endTime` fallback.
+- [x] Add an OpenAI TTS generation script that reads episode segments, generates one MP3 per enabled sentence, supports `OPENAI_API_KEY`, skips existing files, and can resume after failures.
+- [x] Keep Google Translate TTS as a fallback provider if OpenAI TTS is unavailable.
+- [x] Update the practice player so segments with `audioFile` play the per-sentence MP3 directly.
+- [x] Add verification for generated static assets: every enabled sentence has text, every `audioFile` exists, and Pages-relative paths resolve.
+- [x] Run the existing root SRT sample as the first proof of concept.
+- [x] Update README with text import, SRT import, TTS generation, local secret handling, and GitHub Pages publishing flow.
+- [x] Commit and push generated static data after local verification so GitHub Pages can serve it.
+
 ## Later
 
 - [ ] Consider GitHub Actions automation only after the local production pipeline is stable.

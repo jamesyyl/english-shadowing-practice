@@ -3,6 +3,7 @@ import path from "node:path";
 import { probeAudioDuration } from "./audio.js";
 
 export const ALLOWED_CONTENT_TYPES = new Set(["main", "intro", "ad", "music", "note"]);
+export const ALLOWED_SOURCE_TYPES = new Set(["mp3", "text", "srt", "youtube-srt"]);
 
 export function buildEpisode({ id, title, sourceType = "mp3", sourceUrl = "", level = "G5-G6", duration }) {
   if (!id || !/^[a-z0-9][a-z0-9-]*$/.test(id)) {
@@ -37,9 +38,14 @@ export function validateEpisode(episode) {
   if (episode.schemaVersion !== 1) errors.push("schemaVersion must be 1");
   if (!episode.id) errors.push("id is required");
   if (!episode.title) errors.push("title is required");
-  if (episode.sourceType !== "mp3") errors.push("sourceType must be mp3 for MVP");
-  if (episode.audioFile !== "audio/original.mp3") errors.push("audioFile must be audio/original.mp3");
-  if (!Number.isFinite(episode.duration) || episode.duration <= 0) errors.push("duration must be greater than 0");
+  if (!ALLOWED_SOURCE_TYPES.has(episode.sourceType)) errors.push("sourceType is invalid");
+  if (episode.sourceType === "mp3" && episode.audioFile !== "audio/original.mp3") {
+    errors.push("audioFile must be audio/original.mp3 for mp3 episodes");
+  }
+  if (episode.sourceType !== "mp3" && episode.audioFile !== undefined && typeof episode.audioFile !== "string") {
+    errors.push("audioFile must be a string when provided");
+  }
+  if (!Number.isFinite(episode.duration) || episode.duration < 0) errors.push("duration must be zero or greater");
   if (!episode.level) errors.push("level is required");
   if (!["imported", "transcribed", "reviewed", "ready"].includes(episode.status)) errors.push("status is invalid");
   if (!Array.isArray(episode.segments)) errors.push("segments must be an array");
@@ -52,6 +58,12 @@ export function validateEpisode(episode) {
       }
       if (segment.enabledForPractice !== true && segment.enabledForPractice !== false) {
         errors.push(`segment ${segment.id || "(missing id)"} enabledForPractice must be boolean`);
+      }
+      if (!segment.text || segment.text.trim().length === 0) {
+        errors.push(`segment ${segment.id || "(missing id)"} text is required`);
+      }
+      if (segment.audioFile !== undefined && typeof segment.audioFile !== "string") {
+        errors.push(`segment ${segment.id || "(missing id)"} audioFile must be a string`);
       }
     }
   }

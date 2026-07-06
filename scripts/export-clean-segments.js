@@ -42,7 +42,12 @@ await writeFile(
     {
       episodeId: episode.id,
       title: episode.title,
+      sourceType: episode.sourceType,
+      sourceUrl: episode.sourceUrl || "",
       audioFile: episode.audioFile,
+      ttsProvider: episode.ttsProvider || "",
+      ttsModel: episode.ttsModel || "",
+      ttsVoice: episode.ttsVoice || "",
       segmentCount: cleanEnglishSegments.length,
       segments: cleanEnglishSegments
     },
