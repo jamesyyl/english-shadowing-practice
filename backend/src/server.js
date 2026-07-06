@@ -5,6 +5,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getCleanEnglishSegments } from "./asr.js";
 import { listEpisodeJsonPaths, readEpisode, validateEpisode } from "./episode.js";
+import { buildTextEpisode, segmentsFromSrt, segmentsFromText } from "./text-segments.js";
+import { generateTtsForEpisode } from "./tts.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const frontendRoot = path.join(repoRoot, "frontend");
@@ -30,7 +32,7 @@ function readRequestBody(request) {
     request.setEncoding("utf8");
     request.on("data", (chunk) => {
       body += chunk;
-      if (body.length > 2_000_000) {
+      if (body.length > 5_000_000) {
         reject(new Error("Request body too large."));
         request.destroy();
       }
@@ -54,6 +56,21 @@ async function writeEpisode(episodeId, episode) {
     throw new Error(`Episode validation failed:\n${errors.join("\n")}`);
   }
   await writeFile(getEpisodePath(episodeId), `${JSON.stringify(episode, null, 2)}\n`, "utf8");
+}
+
+async function createImportedEpisode({ episodeId, title, sourceType, sourceUrl = "", level = "G5-G6", segments }) {
+  const episode = buildTextEpisode({
+    id: episodeId,
+    title,
+    sourceType,
+    sourceUrl,
+    level,
+    segments
+  });
+  const episodeDir = path.join(repoRoot, "data", "episodes", episodeId);
+  await mkdir(episodeDir, { recursive: true });
+  await writeEpisode(episodeId, episode);
+  return episode;
 }
 
 async function listEpisodes() {
@@ -157,7 +174,12 @@ async function exportCleanSegments(episodeId, episode) {
       {
         episodeId: episode.id,
         title: episode.title,
+        sourceType: episode.sourceType,
+        sourceUrl: episode.sourceUrl || "",
         audioFile: episode.audioFile,
+        ttsProvider: episode.ttsProvider || "",
+        ttsModel: episode.ttsModel || "",
+        ttsVoice: episode.ttsVoice || "",
         segmentCount: cleanSegments.length,
         segments: cleanSegments
       },
@@ -203,6 +225,34 @@ async function route(request, response) {
       return;
     }
 
+    if (url.pathname === "/api/import/text" && request.method === "POST") {
+      const body = await readRequestBody(request);
+      const episode = await createImportedEpisode({
+        episodeId: body.episodeId,
+        title: body.title,
+        sourceType: "text",
+        sourceUrl: body.sourceUrl || "",
+        level: body.level || "G5-G6",
+        segments: segmentsFromText(body.text || "")
+      });
+      sendJson(response, 200, { episode, cleanSegmentCount: getCleanEnglishSegments(episode).length });
+      return;
+    }
+
+    if (url.pathname === "/api/import/srt" && request.method === "POST") {
+      const body = await readRequestBody(request);
+      const episode = await createImportedEpisode({
+        episodeId: body.episodeId,
+        title: body.title,
+        sourceType: "youtube-srt",
+        sourceUrl: body.sourceUrl || "",
+        level: body.level || "G5-G6",
+        segments: segmentsFromSrt(body.srt || "")
+      });
+      sendJson(response, 200, { episode, cleanSegmentCount: getCleanEnglishSegments(episode).length });
+      return;
+    }
+
     if (parts[0] === "api" && parts[1] === "episodes" && parts[2]) {
       const episodeId = parts[2];
       const episode = await readEpisode(getEpisodePath(episodeId));
@@ -237,6 +287,30 @@ async function route(request, response) {
       if (parts[3] === "export-clean" && request.method === "POST") {
         const result = await exportCleanSegments(episodeId, episode);
         sendJson(response, 200, result);
+        return;
+      }
+
+      if (parts[3] === "generate-tts" && request.method === "POST") {
+        const body = await readRequestBody(request);
+        const result = await generateTtsForEpisode({
+          repoRoot,
+          episode,
+          episodeId,
+          provider: body.provider || "auto",
+          model: body.model || "gpt-4o-mini-tts",
+          voice: body.voice || "coral",
+          language: body.language || "en",
+          force: Boolean(body.force)
+        });
+        await writeEpisode(episodeId, result.episode);
+        sendJson(response, 200, {
+          episode: result.episode,
+          cleanSegmentCount: getCleanEnglishSegments(result.episode).length,
+          provider: result.provider,
+          generated: result.generated,
+          skipped: result.skipped,
+          totalSegments: result.totalSegments
+        });
         return;
       }
 

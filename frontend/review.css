@@ -52,6 +52,7 @@ button:hover {
 
 .topbar,
 .metrics,
+.import-panel,
 .workspace,
 .detail,
 .segment-list,
@@ -142,6 +143,43 @@ textarea {
 
 .metrics strong {
   font-size: 26px;
+}
+
+.import-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 16px;
+}
+
+.import-head,
+.tts-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 280px);
+  gap: 14px;
+  align-items: start;
+}
+
+.import-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.import-head code {
+  color: var(--blue);
+}
+
+.import-mode {
+  align-self: end;
+}
+
+.tts-row {
+  grid-template-columns: 180px 180px 220px auto;
+}
+
+.import-actions {
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .workspace {
@@ -273,6 +311,8 @@ audio {
 
 @media (max-width: 900px) {
   .topbar,
+  .import-head,
+  .tts-row,
   .workspace,
   .audio-panel,
   .form-line {

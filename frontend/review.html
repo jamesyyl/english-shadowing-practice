@@ -34,6 +34,69 @@
         </div>
       </section>
 
+      <section class="import-panel">
+        <div class="import-head">
+          <div>
+            <h2>Import Text or SRT</h2>
+            <p>Local only. This writes episode JSON and optional TTS MP3 files under <code>data/episodes/</code>.</p>
+          </div>
+          <div class="import-mode">
+            <label>
+              Mode
+              <select id="import-mode">
+                <option value="text">Text</option>
+                <option value="srt">SRT</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="form-line import-fields">
+          <label>
+            Episode id
+            <input id="import-id" placeholder="my-episode-id" />
+          </label>
+          <label>
+            Title
+            <input id="import-title" placeholder="Episode title" />
+          </label>
+          <label>
+            Source URL
+            <input id="import-source" placeholder="Optional" />
+          </label>
+        </div>
+        <label>
+          Text / SRT content
+          <textarea id="import-content" rows="7" placeholder="Paste English text or SRT here"></textarea>
+        </label>
+        <div class="tts-row">
+          <label>
+            TTS provider
+            <select id="tts-provider">
+              <option value="auto">auto</option>
+              <option value="openai">openai</option>
+              <option value="google">google fallback</option>
+            </select>
+          </label>
+          <label>
+            OpenAI voice
+            <input id="tts-voice" value="coral" />
+          </label>
+          <label>
+            Model
+            <input id="tts-model" value="gpt-4o-mini-tts" />
+          </label>
+          <label class="check">
+            <input id="tts-force" type="checkbox" />
+            Regenerate existing MP3
+          </label>
+        </div>
+        <div class="actions import-actions">
+          <button id="create-episode" type="button">Create episode</button>
+          <button id="generate-tts" type="button">Generate TTS for selected episode</button>
+          <button id="export-after-tts" type="button">Export selected clean segments</button>
+        </div>
+      </section>
+
       <section class="workspace">
         <aside class="segment-list">
           <div class="list-head">

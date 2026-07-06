@@ -129,7 +129,9 @@ Then open the production review workbench:
 http://127.0.0.1:5177
 ```
 
-The review workbench can load the sample episode, play the full audio, play a selected segment range, edit segment text, change `contentType`, enable or disable practice use, add Chinese hints / keyword notes, split a segment, save back to `episode.json`, and export `clean-segments.json`.
+The review workbench can import pasted text or SRT into a new episode, trigger local TTS generation for the selected episode, load existing episodes, play the full audio or per-sentence MP3, play a selected segment range, edit segment text, change `contentType`, enable or disable practice use, add Chinese hints / keyword notes, split a segment, save back to `episode.json`, and export `clean-segments.json`.
+
+The import and TTS controls are local-only. They are intentionally not exposed on GitHub Pages because Pages cannot safely store API keys or write generated files back into the repository.
 
 Open the child practice app:
 

@@ -10,6 +10,18 @@ const els = {
   statusLabel: document.querySelector("#status-label"),
   segmentCount: document.querySelector("#segment-count"),
   cleanCount: document.querySelector("#clean-count"),
+  importMode: document.querySelector("#import-mode"),
+  importId: document.querySelector("#import-id"),
+  importTitle: document.querySelector("#import-title"),
+  importSource: document.querySelector("#import-source"),
+  importContent: document.querySelector("#import-content"),
+  createEpisode: document.querySelector("#create-episode"),
+  ttsProvider: document.querySelector("#tts-provider"),
+  ttsVoice: document.querySelector("#tts-voice"),
+  ttsModel: document.querySelector("#tts-model"),
+  ttsForce: document.querySelector("#tts-force"),
+  generateTts: document.querySelector("#generate-tts"),
+  exportAfterTts: document.querySelector("#export-after-tts"),
   segments: document.querySelector("#segments"),
   filter: document.querySelector("#filter-input"),
   exportClean: document.querySelector("#export-clean"),
@@ -125,7 +137,7 @@ async function loadEpisode(episodeId) {
   const payload = await api(`/api/episodes/${episodeId}`);
   state.episode = payload.episode;
   state.selectedId = state.episode.segments[0]?.id || null;
-  els.audio.src = `/api/episodes/${episodeId}/audio`;
+  els.audio.src = state.episode.audioFile ? `/api/episodes/${episodeId}/audio` : "";
   renderMetrics(payload.cleanSegmentCount);
   renderSegments();
   renderEditor();
@@ -169,6 +181,12 @@ async function saveSelectedSegment(event) {
 function playSelectedSegment() {
   const segment = selectedSegment();
   if (!segment) return;
+  if (segment.audioFile) {
+    els.audio.src = `/data/episodes/${state.episode.id}/${segment.audioFile}`;
+    els.audio.currentTime = 0;
+    els.audio.play();
+    return;
+  }
   els.audio.currentTime = segment.startTime;
   els.audio.play();
   const stopAt = segment.endTime;
@@ -239,6 +257,48 @@ async function exportCleanSegments() {
   showMessage(`Exported ${result.segmentCount} segments to ${result.output}`);
 }
 
+async function createEpisodeFromImport() {
+  const mode = els.importMode.value;
+  const episodeId = els.importId.value.trim();
+  const title = els.importTitle.value.trim();
+  const sourceUrl = els.importSource.value.trim();
+  const content = els.importContent.value;
+  const endpoint = mode === "srt" ? "/api/import/srt" : "/api/import/text";
+  const body = mode === "srt"
+    ? { episodeId, title, sourceUrl, srt: content }
+    : { episodeId, title, sourceUrl, text: content };
+
+  if (!episodeId || !title || !content.trim()) {
+    throw new Error("Episode id, title, and content are required.");
+  }
+
+  showMessage(`Creating ${episodeId}...`);
+  await api(endpoint, { method: "POST", body: JSON.stringify(body) });
+  await loadEpisodes();
+  els.episodeSelect.value = episodeId;
+  await loadEpisode(episodeId);
+  showMessage(`Created ${episodeId}. Review sentences, then generate TTS.`);
+}
+
+async function generateTtsForSelectedEpisode() {
+  if (!state.episode) return;
+  showMessage(`Generating TTS for ${state.episode.id}. This can take several minutes...`);
+  const result = await api(`/api/episodes/${state.episode.id}/generate-tts`, {
+    method: "POST",
+    body: JSON.stringify({
+      provider: els.ttsProvider.value,
+      voice: els.ttsVoice.value.trim() || "coral",
+      model: els.ttsModel.value.trim() || "gpt-4o-mini-tts",
+      force: els.ttsForce.checked
+    })
+  });
+  state.episode = result.episode;
+  renderMetrics(result.cleanSegmentCount);
+  renderSegments();
+  renderEditor();
+  showMessage(`TTS complete: ${result.generated} generated, ${result.skipped} skipped, provider ${result.provider}.`);
+}
+
 els.episodeSelect.addEventListener("change", () => loadEpisode(els.episodeSelect.value).catch((error) => showMessage(error.message)));
 els.filter.addEventListener("input", () => {
   state.filter = els.filter.value;
@@ -256,5 +316,8 @@ els.playSegment.addEventListener("click", playSelectedSegment);
 els.applySplit.addEventListener("click", () => splitSelectedSegment().catch((error) => showMessage(error.message)));
 els.mergeNext.addEventListener("click", () => mergeSelectedWithNextSegment().catch((error) => showMessage(error.message)));
 els.exportClean.addEventListener("click", () => exportCleanSegments().catch((error) => showMessage(error.message)));
+els.createEpisode.addEventListener("click", () => createEpisodeFromImport().catch((error) => showMessage(error.message)));
+els.generateTts.addEventListener("click", () => generateTtsForSelectedEpisode().catch((error) => showMessage(error.message)));
+els.exportAfterTts.addEventListener("click", () => exportCleanSegments().catch((error) => showMessage(error.message)));
 
 loadEpisodes().catch((error) => showMessage(error.message));
