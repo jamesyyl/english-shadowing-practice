@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>English Shadowing Practice</title>
+    <link rel="stylesheet" href="practice.css" />
+  </head>
+  <body>
+    <main class="practice-shell">
+      <section class="episode-hero">
+        <div class="title-block">
+          <p class="eyebrow">English Shadowing Practice</p>
+          <h1 id="episode-title">Loading...</h1>
+        </div>
+        <div class="progress-card" aria-live="polite">
+          <span id="stage-label">Stage 1</span>
+          <strong id="overall-progress">0%</strong>
+        </div>
+      </section>
+
+      <nav class="stage-tabs" aria-label="Practice stages">
+        <button class="stage-tab active" data-stage="listen">1 先聽整集</button>
+        <button class="stage-tab" data-stage="intensive">2 純英文精聽</button>
+        <button class="stage-tab" data-stage="shadowing">3 Shadowing</button>
+      </nav>
+
+      <section class="player-band">
+        <audio id="episode-audio" controls preload="metadata"></audio>
+        <div class="time-readout">
+          <span id="current-time">0:00</span>
+          <span id="duration">0:00</span>
+        </div>
+      </section>
+
+      <section id="listen-panel" class="stage-panel active">
+        <div class="listen-layout">
+          <section class="focus-panel">
+            <h2>理解重點</h2>
+            <p id="episode-summary"></p>
+            <div id="focus-chips" class="chip-row"></div>
+          </section>
+          <section class="big-action-panel">
+            <div class="ring" aria-hidden="true">
+              <span id="listen-percent">0%</span>
+            </div>
+            <button id="mark-listened" class="primary-action">完成整集聆聽</button>
+          </section>
+        </div>
+      </section>
+
+      <section id="intensive-panel" class="stage-panel">
+        <div class="sentence-workspace">
+          <aside class="sentence-rail" id="intensive-list"></aside>
+          <section class="sentence-card">
+            <div class="sentence-meta">
+              <span id="intensive-count">1 / 1</span>
+              <span id="intensive-range">0:00 - 0:00</span>
+            </div>
+            <p id="intensive-text" class="sentence-text"></p>
+            <div class="controls-row">
+              <button id="prev-intensive">上一句</button>
+              <button id="play-intensive" class="primary-action">播放本句</button>
+              <button id="replay-intensive">再聽一次</button>
+              <button id="next-intensive">下一句</button>
+            </div>
+            <div class="rate-control">
+              <label for="playback-rate">速度</label>
+              <input id="playback-rate" type="range" min="0.65" max="1" step="0.05" value="1" />
+              <span id="rate-label">1.00x</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="shadowing-panel" class="stage-panel">
+        <div class="shadowing-layout">
+          <section class="sentence-card shadow-card">
+            <div class="sentence-meta">
+              <span id="shadowing-count">1 / 1</span>
+              <span id="shadowing-status">Not done</span>
+            </div>
+            <p id="shadowing-text" class="sentence-text"></p>
+            <div class="controls-row">
+              <button id="prev-shadowing">上一句</button>
+              <button id="play-shadowing" class="primary-action">播放本句</button>
+              <button id="shadowing-repeat">再聽一次</button>
+              <button id="next-shadowing">下一句</button>
+            </div>
+            <div class="shadow-actions">
+              <button id="mark-spoken">我跟讀了</button>
+              <button id="mark-difficult">太難了</button>
+            </div>
+          </section>
+          <section class="summary-panel">
+            <h2>練習紀錄</h2>
+            <dl>
+              <div>
+                <dt>已精聽</dt>
+                <dd id="intensive-done">0</dd>
+              </div>
+              <div>
+                <dt>已跟讀</dt>
+                <dd id="shadowing-done">0</dd>
+              </div>
+              <div>
+                <dt>難句</dt>
+                <dd id="difficult-count">0</dd>
+              </div>
+              <div>
+                <dt>重播</dt>
+                <dd id="replay-count">0</dd>
+              </div>
+            </dl>
+            <p id="completion-note" class="completion-note"></p>
+            <button id="reset-progress" class="quiet-action">重置進度</button>
+          </section>
+        </div>
+      </section>
+
+      <p id="status-message" class="status-message" aria-live="polite"></p>
+    </main>
+
+    <script src="practice.js" type="module"></script>
+  </body>
+</html>

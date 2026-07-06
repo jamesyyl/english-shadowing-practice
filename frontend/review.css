@@ -1,0 +1,300 @@
+:root {
+  --ink: #17211d;
+  --muted: #68736e;
+  --line: #d8ded6;
+  --paper: #f7f5ef;
+  --panel: #ffffff;
+  --olive: #4f6f52;
+  --blue: #315f7d;
+  --rust: #a75b3a;
+  --gold: #d7b45a;
+  --shadow: 0 18px 48px rgba(32, 43, 38, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(79, 111, 82, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(49, 95, 125, 0.05) 1px, transparent 1px),
+    var(--paper);
+  background-size: 28px 28px;
+  font-family: Cambria, Georgia, serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: white;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--blue);
+}
+
+.shell {
+  width: min(1500px, calc(100vw - 32px));
+  margin: 20px auto;
+}
+
+.topbar,
+.metrics,
+.workspace,
+.detail,
+.segment-list,
+.editor,
+.splitter {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.topbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--rust);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(28px, 4vw, 52px);
+}
+
+h2 {
+  font-size: 20px;
+}
+
+.episode-picker {
+  min-width: 320px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  padding: 10px;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 14px;
+}
+
+.metrics div {
+  padding: 16px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.metrics div:last-child {
+  border-right: 0;
+}
+
+.label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metrics strong {
+  font-size: 26px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(520px, 1.55fr);
+  gap: 0;
+  margin-top: 14px;
+  min-height: 700px;
+}
+
+.segment-list {
+  box-shadow: none;
+  border: 0;
+  border-right: 1px solid var(--line);
+}
+
+.list-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.segments {
+  max-height: 780px;
+  overflow: auto;
+}
+
+.segment-row {
+  display: grid;
+  grid-template-columns: 78px 1fr auto;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  padding: 12px 14px;
+}
+
+.segment-row:hover,
+.segment-row.active {
+  background: #eef3ea;
+}
+
+.segment-row .id {
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.segment-row .copy {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill {
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  font-size: 12px;
+  background: white;
+}
+
+.pill.off {
+  color: var(--rust);
+}
+
+.detail {
+  display: grid;
+  gap: 14px;
+  border: 0;
+  box-shadow: none;
+  padding: 16px;
+}
+
+.audio-panel {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+audio {
+  width: 100%;
+}
+
+.editor,
+.splitter {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.form-line {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  color: var(--ink);
+}
+
+.check input {
+  width: auto;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.message {
+  min-height: 24px;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .topbar,
+  .workspace,
+  .audio-panel,
+  .form-line {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    display: grid;
+    gap: 14px;
+  }
+
+  .episode-picker {
+    min-width: 0;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .segment-list {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}

@@ -1,0 +1,331 @@
+const episodeId = "bedtime-old-woman-shoe";
+const progressKey = `english-shadowing-progress:${episodeId}`;
+
+const fallbackFocus = {
+  summary:
+    "先聽完整故事，抓住人物、地點和問題：Dandelion 遇見住在鞋子裡的老婦人，故事重點在對話、情緒變化和最後的轉折。",
+  chips: ["Dandelion", "old woman", "shoe", "broth", "children", "lesson"]
+};
+
+const state = {
+  stage: "listen",
+  episode: null,
+  segments: [],
+  currentIndex: 0,
+  progress: {
+    stage: "listen",
+    currentSegmentId: "",
+    listened: false,
+    intensiveCompletedIds: [],
+    shadowedIds: [],
+    difficultIds: [],
+    replayCounts: {},
+    updatedAt: ""
+  },
+  stopHandler: null
+};
+
+const els = {
+  title: document.querySelector("#episode-title"),
+  stageLabel: document.querySelector("#stage-label"),
+  overallProgress: document.querySelector("#overall-progress"),
+  audio: document.querySelector("#episode-audio"),
+  currentTime: document.querySelector("#current-time"),
+  duration: document.querySelector("#duration"),
+  tabs: document.querySelectorAll(".stage-tab"),
+  panels: {
+    listen: document.querySelector("#listen-panel"),
+    intensive: document.querySelector("#intensive-panel"),
+    shadowing: document.querySelector("#shadowing-panel")
+  },
+  summary: document.querySelector("#episode-summary"),
+  chips: document.querySelector("#focus-chips"),
+  listenPercent: document.querySelector("#listen-percent"),
+  markListened: document.querySelector("#mark-listened"),
+  intensiveList: document.querySelector("#intensive-list"),
+  intensiveCount: document.querySelector("#intensive-count"),
+  intensiveRange: document.querySelector("#intensive-range"),
+  intensiveText: document.querySelector("#intensive-text"),
+  prevIntensive: document.querySelector("#prev-intensive"),
+  playIntensive: document.querySelector("#play-intensive"),
+  replayIntensive: document.querySelector("#replay-intensive"),
+  nextIntensive: document.querySelector("#next-intensive"),
+  playbackRate: document.querySelector("#playback-rate"),
+  rateLabel: document.querySelector("#rate-label"),
+  shadowingCount: document.querySelector("#shadowing-count"),
+  shadowingStatus: document.querySelector("#shadowing-status"),
+  shadowingText: document.querySelector("#shadowing-text"),
+  prevShadowing: document.querySelector("#prev-shadowing"),
+  playShadowing: document.querySelector("#play-shadowing"),
+  shadowingRepeat: document.querySelector("#shadowing-repeat"),
+  nextShadowing: document.querySelector("#next-shadowing"),
+  markSpoken: document.querySelector("#mark-spoken"),
+  markDifficult: document.querySelector("#mark-difficult"),
+  intensiveDone: document.querySelector("#intensive-done"),
+  shadowingDone: document.querySelector("#shadowing-done"),
+  difficultCount: document.querySelector("#difficult-count"),
+  replayCount: document.querySelector("#replay-count"),
+  completionNote: document.querySelector("#completion-note"),
+  resetProgress: document.querySelector("#reset-progress"),
+  message: document.querySelector("#status-message")
+};
+
+function unique(items) {
+  return [...new Set(items)];
+}
+
+function formatTime(seconds) {
+  const safe = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+  const minutes = Math.floor(safe / 60);
+  const rest = Math.floor(safe % 60).toString().padStart(2, "0");
+  return `${minutes}:${rest}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function fetchJson(candidates) {
+  let lastError;
+  for (const path of candidates) {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return { path, data: await response.json() };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem(progressKey);
+  if (!raw) return;
+  try {
+    state.progress = { ...state.progress, ...JSON.parse(raw) };
+  } catch {
+    localStorage.removeItem(progressKey);
+  }
+}
+
+function saveProgress() {
+  state.progress.stage = state.stage;
+  state.progress.currentSegmentId = segment()?.id || "";
+  state.progress.updatedAt = new Date().toISOString();
+  localStorage.setItem(progressKey, JSON.stringify(state.progress));
+}
+
+function segment() {
+  return state.segments[state.currentIndex];
+}
+
+function completionPercent() {
+  const total = state.segments.length || 1;
+  const listen = state.progress.listened ? 1 : 0;
+  const intensive = state.progress.intensiveCompletedIds.length / total;
+  const shadowing = state.progress.shadowedIds.length / total;
+  return Math.round(((listen + intensive + shadowing) / 3) * 100);
+}
+
+function setStage(stage) {
+  state.stage = stage;
+  els.tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.stage === stage));
+  Object.entries(els.panels).forEach(([key, panel]) => panel.classList.toggle("active", key === stage));
+  els.stageLabel.textContent = stage === "listen" ? "Stage 1" : stage === "intensive" ? "Stage 2" : "Stage 3";
+  saveProgress();
+  render();
+}
+
+function renderOverview() {
+  els.title.textContent = state.episode.title;
+  els.summary.textContent = fallbackFocus.summary;
+  els.chips.innerHTML = fallbackFocus.chips.map((chip) => `<span>${chip}</span>`).join("");
+}
+
+function renderList() {
+  els.intensiveList.innerHTML = state.segments
+    .map((item, index) => {
+      const done = state.progress.intensiveCompletedIds.includes(item.id) ? " done" : "";
+      const current = index === state.currentIndex ? " current" : "";
+      return `<button class="sentence-jump${done}${current}" data-index="${index}">
+        <span>${index + 1}</span>
+        ${escapeHtml(item.text)}
+      </button>`;
+    })
+    .join("");
+}
+
+function renderSentence() {
+  const current = segment();
+  if (!current) return;
+
+  const count = `${state.currentIndex + 1} / ${state.segments.length}`;
+  const range = `${formatTime(current.startTime)} - ${formatTime(current.endTime)}`;
+  els.intensiveCount.textContent = count;
+  els.intensiveRange.textContent = range;
+  els.intensiveText.textContent = current.text;
+  els.shadowingCount.textContent = count;
+  els.shadowingText.textContent = current.text;
+  els.shadowingStatus.textContent = state.progress.shadowedIds.includes(current.id) ? "Done" : "Not done";
+  els.markDifficult.classList.toggle("active", state.progress.difficultIds.includes(current.id));
+}
+
+function renderStats() {
+  const totalReplays = Object.values(state.progress.replayCounts).reduce((sum, value) => sum + value, 0);
+  els.intensiveDone.textContent = state.progress.intensiveCompletedIds.length;
+  els.shadowingDone.textContent = state.progress.shadowedIds.length;
+  els.difficultCount.textContent = state.progress.difficultIds.length;
+  els.replayCount.textContent = totalReplays;
+  els.overallProgress.textContent = `${completionPercent()}%`;
+  els.completionNote.textContent =
+    state.progress.shadowedIds.length === state.segments.length ? "本集完成" : "完成所有句子後會在這裡看到結算。";
+}
+
+function render() {
+  const listenedPercent = state.progress.listened ? 100 : Math.round((els.audio.currentTime / (els.audio.duration || 1)) * 100);
+  els.listenPercent.textContent = `${Math.min(100, listenedPercent || 0)}%`;
+  renderList();
+  renderSentence();
+  renderStats();
+}
+
+function markCurrentIntensiveDone() {
+  const current = segment();
+  if (!current) return;
+  state.progress.intensiveCompletedIds = unique([...state.progress.intensiveCompletedIds, current.id]);
+}
+
+function recordReplay() {
+  const current = segment();
+  if (!current) return;
+  state.progress.replayCounts[current.id] = (state.progress.replayCounts[current.id] || 0) + 1;
+}
+
+function playCurrentSegment({ replay = false } = {}) {
+  const current = segment();
+  if (!current) return;
+  if (state.stopHandler) els.audio.removeEventListener("timeupdate", state.stopHandler);
+  if (replay) recordReplay();
+  els.audio.currentTime = current.startTime;
+  els.audio.playbackRate = Number(els.playbackRate.value);
+  els.audio.play();
+  state.stopHandler = () => {
+    if (els.audio.currentTime >= current.endTime) {
+      els.audio.pause();
+      els.audio.removeEventListener("timeupdate", state.stopHandler);
+      state.stopHandler = null;
+      if (state.stage === "intensive") {
+        markCurrentIntensiveDone();
+        saveProgress();
+        if (state.progress.intensiveCompletedIds.length === state.segments.length) {
+          setStage("shadowing");
+        } else {
+          render();
+        }
+      }
+    }
+  };
+  els.audio.addEventListener("timeupdate", state.stopHandler);
+}
+
+function move(delta) {
+  state.currentIndex = Math.min(Math.max(state.currentIndex + delta, 0), state.segments.length - 1);
+  saveProgress();
+  render();
+}
+
+function markShadowed() {
+  const current = segment();
+  if (!current) return;
+  state.progress.shadowedIds = unique([...state.progress.shadowedIds, current.id]);
+  saveProgress();
+  if (state.currentIndex < state.segments.length - 1) state.currentIndex += 1;
+  saveProgress();
+  render();
+}
+
+function toggleDifficult() {
+  const current = segment();
+  if (!current) return;
+  const set = new Set(state.progress.difficultIds);
+  if (set.has(current.id)) set.delete(current.id);
+  else set.add(current.id);
+  state.progress.difficultIds = [...set];
+  saveProgress();
+  render();
+}
+
+function bindEvents() {
+  els.tabs.forEach((tab) => tab.addEventListener("click", () => setStage(tab.dataset.stage)));
+  els.markListened.addEventListener("click", () => {
+    state.progress.listened = true;
+    saveProgress();
+    setStage("intensive");
+  });
+  els.intensiveList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-index]");
+    if (!button) return;
+    state.currentIndex = Number(button.dataset.index);
+    saveProgress();
+    render();
+  });
+  els.prevIntensive.addEventListener("click", () => move(-1));
+  els.nextIntensive.addEventListener("click", () => move(1));
+  els.playIntensive.addEventListener("click", () => playCurrentSegment());
+  els.replayIntensive.addEventListener("click", () => playCurrentSegment({ replay: true }));
+  els.prevShadowing.addEventListener("click", () => move(-1));
+  els.nextShadowing.addEventListener("click", () => move(1));
+  els.playShadowing.addEventListener("click", () => playCurrentSegment());
+  els.shadowingRepeat.addEventListener("click", () => playCurrentSegment({ replay: true }));
+  els.markSpoken.addEventListener("click", markShadowed);
+  els.markDifficult.addEventListener("click", toggleDifficult);
+  els.playbackRate.addEventListener("input", () => {
+    els.audio.playbackRate = Number(els.playbackRate.value);
+    els.rateLabel.textContent = `${Number(els.playbackRate.value).toFixed(2)}x`;
+  });
+  els.audio.addEventListener("timeupdate", () => {
+    els.currentTime.textContent = formatTime(els.audio.currentTime);
+    if (state.stage === "listen" && !state.progress.listened) {
+      const percent = Math.round((els.audio.currentTime / (els.audio.duration || 1)) * 100);
+      els.listenPercent.textContent = `${Math.min(100, percent || 0)}%`;
+      renderStats();
+    }
+  });
+  els.audio.addEventListener("loadedmetadata", () => {
+    els.duration.textContent = formatTime(els.audio.duration);
+    render();
+  });
+  els.resetProgress.addEventListener("click", () => {
+    localStorage.removeItem(progressKey);
+    window.location.reload();
+  });
+}
+
+async function init() {
+  bindEvents();
+  loadProgress();
+  const clean = await fetchJson([
+    `/data/episodes/${episodeId}/clean-segments.json`,
+    `../data/episodes/${episodeId}/clean-segments.json`
+  ]);
+  state.episode = clean.data;
+  state.segments = clean.data.segments;
+  if (state.progress.currentSegmentId) {
+    const savedIndex = state.segments.findIndex((item) => item.id === state.progress.currentSegmentId);
+    if (savedIndex >= 0) state.currentIndex = savedIndex;
+  }
+  const dataBase = clean.path.startsWith("..") ? `../data/episodes/${episodeId}` : `/data/episodes/${episodeId}`;
+  els.audio.src = `${dataBase}/${clean.data.audioFile}`;
+  renderOverview();
+  setStage(state.progress.stage || "listen");
+}
+
+init().catch((error) => {
+  els.message.textContent = error.message;
+});

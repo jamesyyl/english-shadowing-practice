@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Episode Review Workbench</title>
+    <link rel="stylesheet" href="/review.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">English Shadowing Practice</p>
+          <h1>Episode Review Workbench</h1>
+        </div>
+        <div class="episode-picker">
+          <label for="episode-select">Episode</label>
+          <select id="episode-select"></select>
+        </div>
+      </section>
+
+      <section class="metrics" aria-live="polite">
+        <div>
+          <span class="label">Status</span>
+          <strong id="status-label">-</strong>
+        </div>
+        <div>
+          <span class="label">Segments</span>
+          <strong id="segment-count">-</strong>
+        </div>
+        <div>
+          <span class="label">Practice</span>
+          <strong id="clean-count">-</strong>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="segment-list">
+          <div class="list-head">
+            <input id="filter-input" type="search" placeholder="Filter text or id" />
+            <button id="export-clean">Export</button>
+          </div>
+          <div id="segments" class="segments"></div>
+        </aside>
+
+        <section class="detail">
+          <div class="audio-panel">
+            <audio id="audio" controls preload="metadata"></audio>
+            <button id="play-segment">Play segment</button>
+          </div>
+
+          <form id="segment-form" class="editor">
+            <div class="form-line">
+              <label>
+                Segment
+                <input id="segment-id" readonly />
+              </label>
+              <label>
+                Start
+                <input id="segment-start" type="number" step="0.01" readonly />
+              </label>
+              <label>
+                End
+                <input id="segment-end" type="number" step="0.01" readonly />
+              </label>
+            </div>
+
+            <label>
+              Text
+              <textarea id="segment-text" rows="5"></textarea>
+            </label>
+
+            <div class="form-line">
+              <label>
+                Type
+                <select id="segment-type">
+                  <option value="main">main</option>
+                  <option value="intro">intro</option>
+                  <option value="ad">ad</option>
+                  <option value="music">music</option>
+                  <option value="note">note</option>
+                </select>
+              </label>
+              <label class="check">
+                <input id="segment-enabled" type="checkbox" />
+                Practice segment
+              </label>
+            </div>
+
+            <label>
+              Chinese hint
+              <textarea id="segment-hint" rows="3"></textarea>
+            </label>
+
+            <label>
+              Keywords, comma separated
+              <input id="segment-keywords" />
+            </label>
+
+            <label>
+              Phrase notes, one per line
+              <textarea id="segment-phrases" rows="3"></textarea>
+            </label>
+
+            <div class="actions">
+              <button id="save-segment" type="submit">Save segment</button>
+            </div>
+          </form>
+
+          <section class="splitter">
+            <h2>Split Selected Segment</h2>
+            <div class="form-line">
+              <label>
+                Split time
+                <input id="split-time" type="number" step="0.01" />
+              </label>
+              <label>
+                First id
+                <input id="split-id-a" />
+              </label>
+              <label>
+                Second id
+                <input id="split-id-b" />
+              </label>
+            </div>
+            <label>
+              First text
+              <textarea id="split-text-a" rows="3"></textarea>
+            </label>
+            <label>
+              Second text
+              <textarea id="split-text-b" rows="3"></textarea>
+            </label>
+            <div class="actions">
+              <button id="apply-split">Apply split</button>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <p id="message" class="message"></p>
+    </main>
+
+    <script src="/review.js" type="module"></script>
+  </body>
+</html>

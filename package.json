@@ -1,0 +1,16 @@
+{
+  "name": "english-shadowing-practice",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local-first proof of concept for English listening and shadowing practice.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test backend/test/*.test.js",
+    "verify": "node scripts/verify-episodes.js",
+    "review": "node backend/src/server.js",
+    "practice": "node backend/src/server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

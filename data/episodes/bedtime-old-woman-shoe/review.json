@@ -1,0 +1,52 @@
+{
+  "segments": {
+    "seg-001": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-002": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-003": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-004": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-005": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-006": {
+      "contentType": "intro",
+      "enabledForPractice": false
+    },
+    "seg-007": {
+      "splitInto": [
+        {
+          "id": "seg-007-title",
+          "startTime": 22.92,
+          "endTime": 26.2,
+          "text": "When the old woman moved from the shoe.",
+          "contentType": "intro",
+          "enabledForPractice": false
+        },
+        {
+          "id": "seg-007",
+          "startTime": 26.2,
+          "endTime": 29.96,
+          "text": "There was once a little goblin woman who had",
+          "contentType": "main",
+          "enabledForPractice": true
+        }
+      ]
+    },
+    "seg-109": {
+      "contentType": "note",
+      "enabledForPractice": false
+    }
+  }
+}
