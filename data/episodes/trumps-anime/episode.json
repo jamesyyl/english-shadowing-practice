@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "id": "trumps-anime",
+  "title": "Growing Backlash Over Trump's Anime Use",
+  "sourceType": "text",
+  "sourceUrl": "",
+  "duration": 0,
+  "level": "G5-G6",
+  "status": "ready",
+  "segments": [
+    {
+      "id": "sent-001",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "US President Donald Trump is using Japanese anime characters in his social media posts.",
+      "translationHint": "美國總統川普在社交媒體貼文中使用日本動漫角色。",
+      "keywords": [],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-001.mp3"
+    },
+    {
+      "id": "sent-002",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "Many people in Japan are upset about this.",
+      "translationHint": "日本許多人對此感到不滿。",
+      "keywords": [
+        "upset /əpˈsɛt/   adj. 心情不好的 v. 使心情不快 n. 不快的情緒"
+      ],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-002.mp3"
+    },
+    {
+      "id": "sent-003",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "Trump posted pictures of famous characters like Naruto, Pikachu, and Yu-Gi-Oh!.",
+      "translationHint": "川普發布了包括火影忍者、皮卡丘和遊戲王等知名角色的圖片",
+      "keywords": [],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-003.mp3"
+    },
+    {
+      "id": "sent-004",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "He even made a video showing himself as Naruto.",
+      "translationHint": "甚至製作了一段將自己化身為火影忍者的影片。",
+      "keywords": [],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-004.mp3"
+    },
+    {
+      "id": "sent-005",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "Almost 20,000 people signed a petition asking him to stop.",
+      "translationHint": "近兩萬人簽署請願書，要求他停止這樣的行為。",
+      "keywords": [
+        "petition /pəˈtɪʃ.ən/   n. 請願書或請求 v. 提出請願或要求"
+      ],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-005.mp3"
+    },
+    {
+      "id": "sent-006",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "Fans say these characters teach important lessons about friendship and courage.",
+      "translationHint": "粉絲表示這些角色傳達了關於友誼與勇氣的重要課題",
+      "keywords": [],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-006.mp3"
+    },
+    {
+      "id": "sent-007",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "They think Trump should not use them for politics.",
+      "translationHint": "他們認為川普不應將這些角色用於政治目的。",
+      "keywords": [],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-007.mp3"
+    },
+    {
+      "id": "sent-008",
+      "startTime": 0,
+      "endTime": 0,
+      "sourceStartTime": 0,
+      "sourceEndTime": 0,
+      "text": "The Pokémon Company said Trump did not ask for permission to use their characters.",
+      "translationHint": "寶可夢公司表示川普未經許可使用他們的角色。",
+      "keywords": [
+        "permission /pərˈmɪʃ.ən/   n. 允許或許可的狀態。"
+      ],
+      "phraseNotes": [],
+      "wordTimings": [],
+      "enabledForPractice": true,
+      "contentType": "main",
+      "audioFile": "audio/sentences/sent-008.mp3"
+    }
+  ],
+  "ttsProvider": "google-translate",
+  "ttsModel": "translate_tts",
+  "ttsVoice": "en"
+}

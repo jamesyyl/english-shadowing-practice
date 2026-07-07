@@ -1,12 +1,30 @@
 {
   "episodes": [
     {
+      "id": "trumps-anime",
+      "title": "Growing Backlash Over Trump's Anime Use",
+      "sourceType": "text",
+      "status": "ready",
+      "segmentCount": 8,
+      "cleanSegmentCount": 8,
+      "ttsProvider": "google-translate"
+    },
+    {
       "id": "youtube-shadowing-steps",
       "title": "Shadowing Practice Steps",
       "sourceType": "youtube-srt",
       "status": "ready",
       "segmentCount": 545,
       "cleanSegmentCount": 545,
+      "ttsProvider": "google-translate"
+    },
+    {
+      "id": "taipei-zoo",
+      "title": "Taipei Zoo Invites Visitors to Discover What Animals Do After Dark",
+      "sourceType": "text",
+      "status": "reviewed",
+      "segmentCount": 11,
+      "cleanSegmentCount": 11,
       "ttsProvider": "google-translate"
     },
     {
